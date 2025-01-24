@@ -14,14 +14,71 @@ model User {
   createdAt DateTime @default(now())
 }
 
+// ==========================================
+// NEU: Category (für Kategorien im Discord)
+// ==========================================
+model Category {
+  id                  String   @id @default(cuid())
+
+  // Name (so heißt die Kategorie im Discord)
+  name                String
+
+  // categoryType: z. B. "freelancers", "contractors", "employees"
+  categoryType        String
+
+  // Wer hat Zugang? (z. B. Discord-Rollen-IDs als String[], später ausbaubar)
+  allowedRoles        String[] @default([])
+
+  // Ob andere Member die Kategorie zumindest sehen
+  isVisible           Boolean  @default(true)
+
+  // Falls man die letzte Benutzung und Gesamtzeit cachen will:
+  lastUsage           DateTime?
+  totalSecondsInCateg Int      @default(0)
+
+  // Timestamps
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relation auf Zonen: Eine Kategorie kann mehrere Zonen enthalten
+  zones               Zone[]
+}
+
+
+
+
+// ===========================
+// Altes Modell: Zone
+// JETZT: Relation auf Category
+// ===========================
 model Zone {
   id              String   @id @default(cuid())
-  zoneKey         String   @unique
+  zoneKey         String   @unique        // NICHT löschen: Bot nutzt es
   zoneName        String
   minutesRequired Int      @default(60)
   pointsGranted   Int      @default(1)
-  createdAt       DateTime @default(now())
+
+  // NEUE Felder zum Anzeigen in UI:
+  lastUsage           DateTime?
+  totalSecondsInZone  Int      @default(0)
+
+  // Relation auf Category (optional, damit altes System nicht bricht)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Falls wir Stats auf Zone-Ebene zuordnen
+  userStats  UserZoneStats[]
 }
+
+// ===============================================================
+// WEITERE UNVERÄNDERTE / LEICHT ANGERICHTE MODELLE
+// (Sie bleiben weitgehend, damit altes System nicht bricht)
+// ===============================================================
+
 
 model SetupChannels {
   id              String   @id @default(cuid())
@@ -63,10 +120,20 @@ model AdminSettings {
   // ... 
 }
 
+// ========================================
+// UserZoneStats: zoneKey + NEU: zoneId
+// ========================================
 model UserZoneStats {
   id                 String   @id @default(cuid())
   userId             String
+
+  // ALT: Bot-Code nutzt zoneKey
   zoneKey            String
+
+  // NEU: Optionale Relation, damit wir schrittweise migrieren können
+  zoneId             String?
+  zone               Zone? @relation(fields: [zoneId], references: [id])
+
   totalSecondsInZone Int      @default(0)
   leftoverSeconds    Int      @default(0)
   pointsInThisZone   Int      @default(0)
@@ -75,6 +142,9 @@ model UserZoneStats {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
+
+
+
 
 model UserGlobalStats {
   id                  String   @id @default(cuid())
