@@ -2,7 +2,7 @@
 
 1.  **Migration ausführen**
     ´´´bash
-    pnpm run migrate
+    pnpm prisma migrate dev --name update_udatedAt
 
 2.  **Client generieren**
     ´´´bash

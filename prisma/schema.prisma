@@ -38,7 +38,7 @@ model Category {
 
   // Timestamps
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @default(now()) @updatedAt
 
   // Relation auf Zonen: Eine Kategorie kann mehrere Zonen enthalten
   zones               Zone[]
@@ -68,7 +68,7 @@ model Zone {
 
   // Timestamps
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime @default(now()) @updatedAt
 
   // Falls wir Stats auf Zone-Ebene zuordnen
   userStats  UserZoneStats[]
@@ -140,7 +140,7 @@ model UserZoneStats {
   lastJoinTimestamp  DateTime?
   lastUsage          DateTime?
   createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime @default(now()) @updatedAt
 }
 
 
@@ -152,5 +152,5 @@ model UserGlobalStats {
   totalPoints         Int      @default(0)
   totalTimeInAllZones Int      @default(0)
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @default(now()) @updatedAt
 }
