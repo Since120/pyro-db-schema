@@ -42,6 +42,8 @@ model Category {
 
   // Relation auf Zonen: Eine Kategorie kann mehrere Zonen enthalten
   zones               Zone[]
+  discordCategoryId   String?
+
 }
 
 
